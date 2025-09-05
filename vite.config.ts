@@ -6,7 +6,7 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    base: "/Who-is-funnier",
+    base: "/giggles-and-wins",
     host: "::",
     port: 8080,
     proxy: {
