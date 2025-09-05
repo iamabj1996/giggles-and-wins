@@ -122,7 +122,7 @@ const StarfieldBackground = () => {
           far: 1000 
         }}
         style={{ 
-          background: 'linear-gradient(180deg, hsl(340 15% 8%), hsl(340 25% 15%))'
+          background: 'linear-gradient(180deg, hsl(340 15% 8%), hsl(310 25% 12%))'
         }}
       >
         <fog attach="fog" args={['#1a0d1a', 5, 25]} />
