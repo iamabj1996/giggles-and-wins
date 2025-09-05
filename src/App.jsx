@@ -152,7 +152,9 @@ const JokeCompetition = () => {
 
   const fetchScores = async () => {
     try {
-      const response = await axios.get("/api/updateScore");
+      const response = await axios.get(
+        "https://joketracker.onrender.com/api/updateScore"
+      );
       console.log("allData", response.data);
 
       setAllScores(response.data); // ✅ Correctly set the fetched data
@@ -175,7 +177,9 @@ const JokeCompetition = () => {
 
   const updateScore = async (name, type) => {
     try {
-      await axios.get(`/api/updateScore/update-score/${name}/${type}`);
+      await axios.get(
+        `https://joketracker.onrender.com/api/updateScore/update-score/${name}/${type}`
+      );
       fetchScores(); // Refresh scores
     } catch (err) {
       console.error("Failed to update score:", err);

@@ -9,13 +9,13 @@ export default defineConfig(({ mode }) => ({
     base: "/giggles-and-wins",
     host: "::",
     port: 8080,
-    proxy: {
-      "/api": {
-        // Any request starting with /api will be proxied
-        target: "https://joketracker.onrender.com/", // Replace with your backend API URL
-        changeOrigin: true, // Needed for virtual hosted sites
-      },
-    },
+    // proxy: {
+    //   "/api": {
+    //     // Any request starting with /api will be proxied
+    //     target: "https://joketracker.onrender.com/", // Replace with your backend API URL
+    //     changeOrigin: true, // Needed for virtual hosted sites
+    //   },
+    // },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(
     Boolean
