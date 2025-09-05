@@ -122,21 +122,15 @@ const StarfieldBackground = () => {
   return (
     <div className="fixed inset-0 -z-10">
       <Canvas
-<<<<<<< HEAD
-        camera={{ 
-          position: [0, 0, 1], 
+        camera={{
+          position: [0, 0, 1],
           fov: 75,
           near: 0.1,
-          far: 1000 
+          far: 1000,
         }}
-        style={{ 
-          background: 'linear-gradient(180deg, hsl(340 15% 8%), hsl(310 25% 12%))'
-=======
-        camera={{ position: [0, 0, 1], fov: 75, near: 0.1, far: 1000 }}
         style={{
           background:
-            "linear-gradient(180deg, hsl(340 15% 8%), hsl(340 25% 15%))",
->>>>>>> b2a3e13 (first commit)
+            "linear-gradient(180deg, hsl(340 15% 8%), hsl(310 25% 12%))",
         }}
       >
         <fog attach="fog" args={["#1a0d1a", 5, 25]} />
