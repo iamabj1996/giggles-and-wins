@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Laugh, RotateCcw, Crown, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import StarfieldBackground from "./StarfieldBackground";
 
 const JokeCompetition = () => {
   const [myScore, setMyScore] = useState(0);
@@ -43,7 +44,9 @@ const JokeCompetition = () => {
   const winner = getWinner();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <>
+      <StarfieldBackground />
+      <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
       <div className="w-full max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -157,7 +160,8 @@ const JokeCompetition = () => {
           </p>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
