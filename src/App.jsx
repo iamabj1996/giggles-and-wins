@@ -281,7 +281,7 @@ const JokeCompetition = () => {
                   setGirlfriendScore((prev) => prev - 1);
                   setLastScorer("girlfriend");
                   updateScore("Nishita", "negative");
-                  toast({ description: "Even stars stumble 🌟" });
+                  toast({ description: "Oopssssss!!!!" });
                 }
               };
 
