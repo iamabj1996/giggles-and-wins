@@ -6,14 +6,20 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
+    base: "/Who-is-funnier",
     host: "::",
     port: 8080,
+    proxy: {
+      "/api": {
+        // Any request starting with /api will be proxied
+        target: "https://joketracker.onrender.com/", // Replace with your backend API URL
+        changeOrigin: true, // Needed for virtual hosted sites
+      },
+    },
   },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
+  plugins: [react(), mode === "development" && componentTagger()].filter(
+    Boolean
+  ),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

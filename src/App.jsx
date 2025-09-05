@@ -1,35 +1,36 @@
-import { useState, useRef, useMemo } from "react";
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
-import * as THREE from 'three';
+import { useState, useRef, useMemo, useEffect } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import axios from "axios";
+import { Points, PointMaterial } from "@react-three/drei";
+import * as THREE from "three";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Laugh, RotateCcw, Crown, Sparkles } from "lucide-react";
+import { Heart, Laugh, RotateCcw, Minus } from "lucide-react";
+import { FaIceCream, FaGamepad } from "react-icons/fa";
 import { toast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Query client setup
 const queryClient = new QueryClient();
 
-// Stars component for 3D background
+// Stars background
 const Stars = () => {
   const ref = useRef(null);
-  
+
   const [positions, colors] = useMemo(() => {
     const positions = new Float32Array(2000 * 3);
     const colors = new Float32Array(2000 * 3);
-    
+
     for (let i = 0; i < 2000; i++) {
-      // Create a sphere distribution of stars
       const x = (Math.random() - 0.5) * 20;
       const y = (Math.random() - 0.5) * 20;
       const z = (Math.random() - 0.5) * 20;
-      
+
       positions.set([x, y, z], i * 3);
-      
-      // Romantic pink/purple color palette
+
       const colorChoice = Math.random();
       if (colorChoice < 0.3) {
         colors.set([1, 0.7, 0.9], i * 3); // Pink
@@ -39,7 +40,7 @@ const Stars = () => {
         colors.set([1, 1, 1], i * 3); // White
       }
     }
-    
+
     return [positions, colors];
   }, []);
 
@@ -47,8 +48,6 @@ const Stars = () => {
     if (ref.current) {
       ref.current.rotation.x -= delta / 10;
       ref.current.rotation.y -= delta / 15;
-      
-      // Add subtle pulsing effect
       const scale = 1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
       ref.current.scale.setScalar(scale);
     }
@@ -56,7 +55,13 @@ const Stars = () => {
 
   return (
     <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={positions} colors={colors} stride={3} frustumCulled={false}>
+      <Points
+        ref={ref}
+        positions={positions}
+        colors={colors}
+        stride={3}
+        frustumCulled={false}
+      >
         <PointMaterial
           transparent
           vertexColors
@@ -70,10 +75,10 @@ const Stars = () => {
   );
 };
 
-// Floating hearts component for 3D background
+// Floating hearts background
 const FloatingHearts = () => {
   const heartsRef = useRef(null);
-  
+
   const heartPositions = useMemo(() => {
     const positions = [];
     for (let i = 0; i < 15; i++) {
@@ -91,9 +96,11 @@ const FloatingHearts = () => {
     if (heartsRef.current) {
       heartsRef.current.children.forEach((heart, index) => {
         const pos = heartPositions[index];
-        heart.position.y = pos.y + Math.sin(state.clock.elapsedTime * pos.speed) * 2;
+        heart.position.y =
+          pos.y + Math.sin(state.clock.elapsedTime * pos.speed) * 2;
         heart.rotation.y = state.clock.elapsedTime * pos.speed;
-        heart.rotation.z = Math.sin(state.clock.elapsedTime * pos.speed * 0.5) * 0.3;
+        heart.rotation.z =
+          Math.sin(state.clock.elapsedTime * pos.speed * 0.5) * 0.3;
       });
     }
   });
@@ -110,11 +117,12 @@ const FloatingHearts = () => {
   );
 };
 
-// Starfield background component
+// Starfield wrapper
 const StarfieldBackground = () => {
   return (
     <div className="fixed inset-0 -z-10">
       <Canvas
+<<<<<<< HEAD
         camera={{ 
           position: [0, 0, 1], 
           fov: 75,
@@ -123,9 +131,15 @@ const StarfieldBackground = () => {
         }}
         style={{ 
           background: 'linear-gradient(180deg, hsl(340 15% 8%), hsl(310 25% 12%))'
+=======
+        camera={{ position: [0, 0, 1], fov: 75, near: 0.1, far: 1000 }}
+        style={{
+          background:
+            "linear-gradient(180deg, hsl(340 15% 8%), hsl(340 25% 15%))",
+>>>>>>> b2a3e13 (first commit)
         }}
       >
-        <fog attach="fog" args={['#1a0d1a', 5, 25]} />
+        <fog attach="fog" args={["#1a0d1a", 5, 25]} />
         <Stars />
         <FloatingHearts />
       </Canvas>
@@ -133,41 +147,90 @@ const StarfieldBackground = () => {
   );
 };
 
-// Main joke competition component
+// JokeCompetition component
 const JokeCompetition = () => {
   const [myScore, setMyScore] = useState(0);
   const [girlfriendScore, setGirlfriendScore] = useState(0);
   const [lastScorer, setLastScorer] = useState(null);
+  const [allScores, setAllScores] = useState([]);
+
+  console.log("allScores", allScores);
+
+  const fetchScores = async () => {
+    try {
+      const response = await axios.get("/api/updateScore");
+      console.log("allData", response.data);
+
+      setAllScores(response.data); // ✅ Correctly set the fetched data
+    } catch (err) {
+      console.error("Failed to fetch scores", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchScores();
+  }, []);
+
+  useEffect(() => {
+    const nikhil = allScores.find((s) => s.name.toLowerCase() === "nikhil");
+    const nishita = allScores.find((s) => s.name.toLowerCase() === "nishita");
+
+    if (nikhil) setMyScore(nikhil.score);
+    if (nishita) setGirlfriendScore(nishita.score);
+  }, [allScores]);
+
+  const updateScore = async (name, type) => {
+    try {
+      await axios.get(`/api/updateScore/update-score/${name}/${type}`);
+      fetchScores(); // Refresh scores
+    } catch (err) {
+      console.error("Failed to update score:", err);
+    }
+  };
 
   const incrementMyScore = () => {
-    setMyScore(prev => prev + 1);
-    setLastScorer('me');
-    toast({
-      description: "Great joke! 😄",
-    });
+    setMyScore((prev) => prev + 1);
+    setLastScorer("me");
+    updateScore("Nikhil", "positive");
+    toast({ description: "Great joke! 😄" });
+  };
+
+  const decrementMyScore = () => {
+    if (myScore > 0) {
+      setMyScore((prev) => prev - 1);
+      setLastScorer("me");
+      updateScore("Nikhil", "negative");
+      toast({ description: "Aww, better luck next time! 🥺" });
+    }
   };
 
   const incrementGirlfriendScore = () => {
-    setGirlfriendScore(prev => prev + 1);
-    setLastScorer('girlfriend');
-    toast({
-      description: "She's got you laughing! 💕",
-    });
+    setGirlfriendScore((prev) => prev + 1);
+    setLastScorer("girlfriend");
+    updateScore("Nishita", "positive");
+    toast({ description: "She's got you laughing! 💕" });
+  };
+
+  const decrementGirlfriendScore = () => {
+    if (girlfriendScore > 0) {
+      setGirlfriendScore((prev) => prev - 1);
+      setLastScorer("girlfriend");
+      updateScore("Nishita", "negative");
+      toast({ description: "Even pros have off days 😅" });
+    }
   };
 
   const resetScores = () => {
     setMyScore(0);
     setGirlfriendScore(0);
     setLastScorer(null);
-    toast({
-      description: "Fresh start! May the best comedian win! 🎭",
-    });
+    toast({ description: "Fresh start! May the best comedian win! 🎭" });
   };
 
   const getWinner = () => {
-    if (myScore > girlfriendScore) return 'me';
-    if (girlfriendScore > myScore) return 'girlfriend';
-    return 'tie';
+    if (myScore > girlfriendScore) return "me";
+    if (girlfriendScore > myScore) return "girlfriend";
+    return "tie";
   };
 
   const winner = getWinner();
@@ -179,97 +242,120 @@ const JokeCompetition = () => {
         <div className="w-full max-w-4xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-4">
               <Laugh className="text-primary animate-float" size={32} />
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Joke Competition
+              <h1 className="text-muted-foreground font-bold text-4xl">
+                Who is funnier ??
               </h1>
-              <Heart className="text-primary animate-float" size={32} />
+              <Laugh className="text-primary animate-float" size={32} />
             </div>
-            <p className="text-muted-foreground text-lg">
-              Who tells the better jokes? Let the battle begin! 💝
+            <p className="text-muted-foreground text-lg mb-4">
+              Who tells the better jokes? Let the battle begin! 💪💪
             </p>
           </div>
 
-          {/* Competition Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* My Card */}
-            <Card className={`romantic-card transition-all duration-300 hover:scale-105 ${
-              lastScorer === 'me' ? 'ring-2 ring-primary ring-opacity-50' : ''
-            }`}>
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-                  <Sparkles className="text-primary" size={24} />
-                  You
-                  {winner === 'me' && <Crown className="text-yellow-500" size={24} />}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center space-y-6">
-                <div className={`text-6xl font-bold text-primary ${
-                  lastScorer === 'me' ? 'score-bounce' : ''
-                }`}>
-                  {myScore}
-                </div>
-                <Button
-                  onClick={incrementMyScore}
-                  variant="default"
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 hover:scale-105"
-                >
-                  <Heart className="mr-2" size={20} />
-                  Nailed It!
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {allScores.map((player, index) => {
+              const isNikhil = player.name.toLowerCase() === "nikhil";
+              const isLastScorer =
+                lastScorer === (isNikhil ? "me" : "girlfriend");
 
-            {/* Girlfriend's Card */}
-            <Card className={`romantic-card transition-all duration-300 hover:scale-105 ${
-              lastScorer === 'girlfriend' ? 'ring-2 ring-primary ring-opacity-50' : ''
-            }`}>
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-                  <Heart className="text-pink-500" size={24} />
-                  Your Girlfriend
-                  {winner === 'girlfriend' && <Crown className="text-yellow-500" size={24} />}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center space-y-6">
-                <div className={`text-6xl font-bold text-primary ${
-                  lastScorer === 'girlfriend' ? 'score-bounce' : ''
-                }`}>
-                  {girlfriendScore}
-                </div>
-                <Button
-                  onClick={incrementGirlfriendScore}
-                  variant="outline"
-                  size="lg"
-                  className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105"
+              const handleIncrement = () => {
+                if (isNikhil) {
+                  setMyScore((prev) => prev + 1);
+                  setLastScorer("me");
+                  updateScore("Nikhil", "positive");
+                  toast({ description: "Nailed it! 🔥" });
+                } else {
+                  setGirlfriendScore((prev) => prev + 1);
+                  setLastScorer("girlfriend");
+                  updateScore("Nishita", "positive");
+                  toast({ description: "She's hilarious! 💕" });
+                }
+              };
+
+              const handleDecrement = () => {
+                if (isNikhil && myScore > 0) {
+                  setMyScore((prev) => prev - 1);
+                  setLastScorer("me");
+                  updateScore("Nikhil", "negative");
+                  toast({ description: "Oops! Try again 😅" });
+                } else if (!isNikhil && girlfriendScore > 0) {
+                  setGirlfriendScore((prev) => prev - 1);
+                  setLastScorer("girlfriend");
+                  updateScore("Nishita", "negative");
+                  toast({ description: "Even stars stumble 🌟" });
+                }
+              };
+
+              const displayedScore = isNikhil ? myScore : girlfriendScore;
+
+              return (
+                <Card
+                  key={player.name}
+                  className={`romantic-card transition-all duration-300 hover:scale-105 ${
+                    isLastScorer ? "ring-2 ring-primary ring-opacity-50" : ""
+                  }`}
                 >
-                  <Heart className="mr-2" size={20} />
-                  She's Hilarious!
-                </Button>
-              </CardContent>
-            </Card>
+                  <CardHeader className="text-center pb-4">
+                    <CardTitle className="flex items-center justify-center gap-2 text-2xl">
+                      {isNikhil ? (
+                        <>
+                          <FaGamepad className="text-primary" size={24} />
+                          Nikhil
+                        </>
+                      ) : (
+                        <>
+                          <FaIceCream className="text-primary" size={24} />
+                          Nishita
+                        </>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-center space-y-4">
+                    <div
+                      className={`text-6xl font-bold text-primary ${
+                        isLastScorer ? "score-bounce" : ""
+                      }`}
+                    >
+                      {displayedScore}
+                    </div>
+                    <div className="flex gap-2 justify-center">
+                      <Button onClick={handleIncrement}>
+                        <Heart className="mr-2" size={20} />
+                        {isNikhil ? "Nailed it!" : "Hilarious!"}
+                      </Button>
+                      <Button variant="outline" onClick={handleDecrement}>
+                        <Minus className="mr-2" size={20} />
+                        {isNikhil ? "Oops!" : "Missed it!"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
-          {/* Winner Display */}
+          {/* Winner */}
           {(myScore > 0 || girlfriendScore > 0) && (
             <div className="text-center mb-6">
               <div className="romantic-card p-6 max-w-md mx-auto">
-                {winner === 'tie' ? (
+                {winner === "tie" ? (
                   <p className="text-lg font-semibold text-muted-foreground">
                     It's a tie! You're both comedy gold! ✨
                   </p>
                 ) : (
                   <p className="text-lg font-semibold text-primary">
-                    {winner === 'me' ? "You're" : "She's"} leading with the laughs! 🎭
+                    {winner === "me" ? "Abraham" : "Nishita"} leading with the
+                    laughs! 🎭
                   </p>
                 )}
               </div>
             </div>
           )}
 
-          {/* Reset Button */}
+          {/* Reset */}
           <div className="text-center">
             <Button
               onClick={resetScores}
@@ -281,20 +367,13 @@ const JokeCompetition = () => {
               New Round
             </Button>
           </div>
-
-          {/* Cute Footer */}
-          <div className="text-center mt-8">
-            <p className="text-sm text-muted-foreground">
-              Made with 💕 for endless laughter together
-            </p>
-          </div>
         </div>
       </div>
     </>
   );
 };
 
-// Main App component
+// App wrapper
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
